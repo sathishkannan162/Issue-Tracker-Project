@@ -2,21 +2,22 @@ const chaiHttp = require("chai-http");
 const chai = require("chai");
 const assert = chai.assert;
 const server = require("../server");
-const myDB = require('../database/connection');
+const myDB = require("../database/connection");
+const sampleData = require("../database/sampleIssues");
 
 chai.use(chaiHttp);
 
-suite("Functional Tests", async function () {
+suite("Functional Tests", function () {
   this.timeout(5000);
-  // delete test records
-  await myDB(IssueModel=>{
-    IssueModel.deleteMany({project: 'chaiTests'})
-    .then(docs=>{
-    console.log('deleted:', docs);
-    })
-    .catch(err=>{
-    console.log(err)
-    });
+  // insert sample data for get query tests
+  myDB(async (IssueModel) => {
+    await IssueModel.insertMany(sampleData)
+      .then((docs) => {
+        console.log("sample data inserted:", docs);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   });
 
   suite("Test all fields POST api/project/chaiTests", function () {
@@ -92,25 +93,47 @@ suite("Functional Tests", async function () {
         });
     });
   });
-  suite('TeSt GET request to /api/issues/{project}',function(){
-    test('TeSt GET request to /api/issues/{project}', function(done){
+  suite("TeSt GET request to /api/issues/{project}", function () {
+    test("TeSt GET request to /api/issues/{project}", function (done) {
       chai
-      .request(server)
-      .get('/api/issues/chaiTests')
-      .end(function(err,res){
-        console.log(res.body);
-        assert.equal(res.body.length,2);
-        assert.equal(res.body[0].issue_title,'chai post all fields');
-        assert.equal(res.body[1].issue_title,'chai post required fields');
-        assert.equal(res.body[0].created_by,'chai');
-        assert.equal(res.body[1].created_by,'chai');
-
-        done();
-      })
-    })
+        .request(server)
+        .get("/api/issues/chaiTests")
+        .end(function (err, res) {
+          console.log(res.body);
+          assert.equal(res.body.length, 2);
+          assert.equal(res.body[0].issue_title, "chai post all fields");
+          assert.equal(res.body[1].issue_title, "chai post required fields");
+          assert.equal(res.body[0].created_by, "chai");
+          assert.equal(res.body[1].created_by, "chai");
+          done();
+        });
+    });
   });
-     
-  
+
+  suite("Delete Sample records and test records", function () {
+    test("delete test and sample records", async function () {
+      // delete test records
+      myDB(async (IssueModel) => {
+        IssueModel.deleteMany({ project: "chaiTests" })
+          .then((docs) => {
+            console.log("test data deleted:", docs);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+      // delete sample data
+      myDB(async (IssueModel) => {
+        await IssueModel.deleteMany({project: {$in: ["checko","soji","daph"] }})
+          .then((docs) => {
+            console.log("sample data deleted:", docs);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+    });
+  });
 });
 
 
