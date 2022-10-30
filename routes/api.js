@@ -11,13 +11,12 @@ module.exports = function (app) {
         project: project
       },{ project: 0, __v: 0})
       .then(docs=>{
-        console.log(`sent ${project} issues to api`);
+        console.log(`sent project: ${project} issues to api`);
       res.json(docs);
       })
       .catch(err=>{
       res.send(err);
-      });
-      
+      });  
     })
     
     .post(function (req, res){
@@ -55,7 +54,17 @@ module.exports = function (app) {
     
     .delete(function (req, res){
       let project = req.params.project;
-      
+      IssueModel.findOneAndRemove({
+        _id: req.body._id
+      })
+      .then(docs=>{
+      console.log('delted',docs);
+      res.json(docs);
+      })
+      .catch(err=>{
+      console.log(err);
+      res.send(err);
+      });
     });
     
 };
