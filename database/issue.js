@@ -25,13 +25,19 @@ let issueSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    assigned_to: String,
+    assigned_to: {
+        type: String,
+        default: ''
+    },
     open: {
         type: Boolean,
         default: true,
         required: true
     },
-    status_text: String
+    status_text: {
+        type: String,
+        default: ''
+    }
 });
 
 module.exports = mongoose.model('Issue',issueSchema);
