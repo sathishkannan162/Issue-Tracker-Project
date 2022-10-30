@@ -7,7 +7,10 @@ async function main(callback) {
 
   try {
     await mongoose
-      .connect(process.env.MONGO_URI + "/" + dbName)
+      .connect(process.env.MONGO_URI + "/" + dbName,{
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      })
       .then(() => {
         console.log("database connection successful");
       })
@@ -18,7 +21,7 @@ async function main(callback) {
 
     await callback(IssueModel);
   } catch (error) {
-    console.log(err);
+    console.log(error);
     throw new Error("Database connection error");
   }
 }
