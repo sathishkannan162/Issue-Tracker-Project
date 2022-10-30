@@ -93,13 +93,12 @@ suite("Functional Tests", function () {
         });
     });
   });
-  suite("TeSt GET request to /api/issues/{project}", function () {
+  suite("TeSt GET request to /api/issues/{project} with no filter", function () {
     test("TeSt GET request to /api/issues/{project}", function (done) {
       chai
         .request(server)
         .get("/api/issues/chaiTests")
         .end(function (err, res) {
-          console.log(res.body);
           assert.equal(res.body.length, 2);
           assert.equal(res.body[0].issue_title, "chai post all fields");
           assert.equal(res.body[1].issue_title, "chai post required fields");
@@ -109,6 +108,54 @@ suite("Functional Tests", function () {
         });
     });
   });
+  suite("TeSt GET request to /api/issues/{project} with one filter", function () {
+    test("TeSt GET request to /api/issues/{project}", function (done) {
+      chai
+        .request(server)
+        .get("/api/issues/checko?open=false")
+        .end(function (err, res) {
+          assert.equal(res.body.length, 1);
+          assert.equal(res.body[0].issue_title, "Fix bug in node env");
+          assert.equal(res.body[0].issue_text, "node");
+          assert.equal(res.body[0].created_by, "Kan");
+          assert.equal(res.body[0].assigned_to, "Kan");
+          assert.isFalse(res.body[0].open);
+          done();
+        });
+    });
+  });
+  suite("TeSt GET request to /api/issues/{project} with multiple filters", function () {
+    test("TeSt GET request to /api/issues/{project}", function (done) {
+      chai
+        .request(server)
+        .get("/api/issues/checko?assigned_to=Joe&open=true")
+        .end(function (err, res) {
+          assert.equal(res.body.length, 2);
+          assert.equal(res.body[0].issue_title, "Bug in UI");
+          assert.equal(res.body[0].issue_text, "Button not working");
+          assert.equal(res.body[0].assigned_to, "Joe");
+          assert.equal(res.body[1].assigned_to, "Joe");
+          assert.isTrue(res.body[0].open);
+          assert.isTrue(res.body[1].open);
+          done();
+        });
+    });
+
+    test("TeSt GET request to /api/issues/{project}", function (done) {
+      chai
+        .request(server)
+        .get("/api/issues/daph?assigned_to=Bale&open=false&created_by=Bale")
+        .end(function (err, res) {
+          assert.equal(res.body.length, 1);
+          assert.equal(res.body[0].issue_title, "Fix error in function");
+          assert.equal(res.body[0].assigned_to, "Bale");
+          assert.equal(res.body[0].created_by, "Bale");
+          assert.isFalse(res.body[0].open);
+          done();
+        });
+    });
+  });
+  
 
   suite("Delete Sample records and test records", function () {
     test("delete test and sample records", async function () {

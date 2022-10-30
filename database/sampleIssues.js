@@ -31,7 +31,7 @@ module.exports = [
     issue_text: "When we send GET Request with query",
     project: "checko",
     created_by: "Maple",
-    assigned_to: "Akash",
+    assigned_to: "Joe",
     open: true,
     status_text: "In progress",
   },
