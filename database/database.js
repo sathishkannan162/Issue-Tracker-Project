@@ -1,5 +1,5 @@
 let mongoose = require("mongoose");
-require("dotenv").config({path: '../.env'})
+require("dotenv").config();
 let dbName = "IssueTracker";
 
 class Database {
