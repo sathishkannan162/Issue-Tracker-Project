@@ -6,9 +6,19 @@ module.exports = function (app,IssueModel) {
   
     .get(function (req, res){
       let project = req.params.project;
-      IssueModel.find({
-        project: project
-      },{ project: 0, __v: 0})
+      let query = req.query
+      console.log(req.query);
+      let issueFields = ["_id","issue_title","issue_text","created_on","updated_on","created_by","assigned_to","open","status_text"];
+      for (var key in req.query) {
+        if (!issueFields.includes(key)) {
+          delete query[key];
+        }
+      }
+      query.project = project; 
+      console.log(query)
+      
+      
+      IssueModel.find(query,{ project: 0, __v: 0})
       .then(docs=>{
         console.log(`sent project: ${project} issues to api`);
       res.json(docs);
