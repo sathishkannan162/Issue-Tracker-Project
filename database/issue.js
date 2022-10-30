@@ -30,4 +30,4 @@ let issueSchema = new mongoose.Schema({
     status_text: String
 });
 
-exports.module = mongoose.model('Issue',issueSchema);
+module.exports = mongoose.model('Issue',issueSchema);
