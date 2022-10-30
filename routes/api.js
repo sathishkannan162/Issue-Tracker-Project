@@ -35,8 +35,22 @@ module.exports = function (app) {
     
     .put(function (req, res){
       let project = req.params.project;
-      
-      
+      console.log(req.body);
+      IssueModel.findOneAndUpdate({
+        _id: req.body._id,
+      },{
+        $set:{
+          open: req.body.open,
+          updated_on: new Date()
+        },
+      },{new: true})
+      .then(docs=>{
+      console.log('found', docs);
+        res.json(docs);
+      })
+      .catch(err=>{
+      console.log(err);
+      });
     })
     
     .delete(function (req, res){
