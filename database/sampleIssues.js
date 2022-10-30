@@ -9,6 +9,15 @@ module.exports = [
     status_text: "Not Started",
   },
   {
+    issue_title: "Fix bug in node env",
+    issue_text: "node",
+    created_by: "Kan",
+    assigned_to: "Kan",
+    project: "checko",
+    open: false,
+    status_text: "Not Started",
+  },
+  {
     issue_title: "Bug in UI",
     issue_text: "Button not working",
     created_by: "Akash",
