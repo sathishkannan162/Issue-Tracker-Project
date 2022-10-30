@@ -11,24 +11,31 @@ module.exports = function (app) {
         project: project
       },{ project: 0, __v: 0})
       .then(docs=>{
+        console.log(`sent ${project} issues to api`);
       res.json(docs);
       })
       .catch(err=>{
       res.send(err);
       });
-
-      
-      
       
     })
     
     .post(function (req, res){
       let project = req.params.project;
-      
+      req.body.project = project;
+      IssueModel.create(req.body)
+      .then(docs=>{
+      console.log('inserted', docs)
+      })
+      .catch(err=>{
+      console.log(err);
+      });
+      res.send(req.body);
     })
     
     .put(function (req, res){
       let project = req.params.project;
+      
       
     })
     

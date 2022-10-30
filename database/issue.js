@@ -26,7 +26,11 @@ let issueSchema = new mongoose.Schema({
         required: true
     },
     assigned_to: String,
-    open: Boolean,
+    open: {
+        type: Boolean,
+        default: true,
+        required: true
+    },
     status_text: String
 });
 
