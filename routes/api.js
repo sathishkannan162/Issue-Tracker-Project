@@ -1,7 +1,6 @@
 'use strict';
-let IssueModel = require('../database/issue');
 
-module.exports = function (app) {
+module.exports = function (app,IssueModel) {
 
   app.route('/api/issues/:project')
   
@@ -24,12 +23,12 @@ module.exports = function (app) {
       req.body.project = project;
       IssueModel.create(req.body)
       .then(docs=>{
-      console.log('inserted', docs)
+      console.log('inserted', docs);
+      res.send(docs);
       })
       .catch(err=>{
       console.log(err);
       });
-      res.send(req.body);
     })
     
     .put(function (req, res){
