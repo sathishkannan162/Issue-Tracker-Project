@@ -27,7 +27,7 @@ module.exports = function (app,IssueModel) {
       res.send(docs);
       })
       .catch(err=>{
-      console.log(err);
+      res.send(err);
       });
     })
     
