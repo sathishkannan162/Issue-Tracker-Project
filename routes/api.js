@@ -65,7 +65,8 @@ module.exports = function (app,IssueModel) {
     .delete(function (req, res){
       let project = req.params.project;
       IssueModel.findOneAndRemove({
-        _id: req.body._id
+        _id: req.body._id,
+        project: project
       })
       .then(docs=>{
       console.log('deleted',docs);
