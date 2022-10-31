@@ -8,9 +8,13 @@ chai.use(chaiHttp);
 require("dotenv").config;
 const Browser = require("zombie/lib");
 // Browser.localAddress = "0.0.0.0:8080"
-Browser.localhost("Issue-Tracker-Project.sathishkannan16.repl.co",process.env.PORT);
+Browser.localhost(
+//  "Issue-Tracker-Project.sathishkannan16.repl.co",
+  "example.com",
+  process.env.PORT
+);
 // Browser.site ='0.0.0.0:8080';
-let IssueModel = require('../database/issue')
+let IssueModel = require("../database/issue");
 
 suite("Functional Tests", function () {
   this.timeout(5000);
@@ -357,63 +361,60 @@ suite("Functional Tests", function () {
     done();
   });
 
-  // suite("Functional tests with zombie", function () {
-  //   const browser = new Browser();
-  //   browser.site = "https://Issue-Tracker-Project.sathishkannan16.repl.co"
+//   suite("Functional tests with zombie", function () {
+//     const browser = new Browser();
+// //    browser.site = "https://Issue-Tracker-Project.sathishkannan16.repl.co"
 
+//     suiteSetup(function (done) {
+//       return browser.visit("/", done);
+//     });
 
-  //   suiteSetup(function (done) {
-  //     return browser.visit("/", done);
-  //   });
+//     suite("Headless browser", function () {
+//       this.timeout(5000);
+//       test('should have a working "site" property', function () {
+//         assert.isNotNull(browser.site);
+//       });
+//     });
 
-  //   suite("Headless browser", function () {
-  //     this.timeout(5000);
-  //     test('should have a working "site" property', function () {
-  //       assert.isNotNull(browser.site);
-  //     });
-  //   });
+//     suite("Issue form at /foo", function (done) {
+//       suiteSetup(function (done) {
+//         return browser.visit("/foo", done);
+//       });
 
-  //   suite("Issue form at /foo", function (done) {
-  //     suiteSetup(function (done) {
-  //       return browser.visit("/foo", done);
-  //     });
-
-  //     test("Submit the form and check for docs", function (done) {
-  //       browser.assert.text("h1#projectTitle", "All issues for: foo");
-  //       browser
-  //         .fill("issue_title", "test1")
-  //         .then(()=>{
-  //           browser.fill("issue_text", "test text1")
-  //         })
-  //         .then(()=>{
-  //           browser.fill("created_by", "zombie");
-  //         })
-  //         .then(() => {
-  //           browser.pressButton("", () => {
-  //             browser.assert.success();
-  //             let ids = browser.html('.id').match(/[a-f\d]{24}/g);
-  //             let unique_ids = [... new Set(ids)]
-  //             console.log(unique_ids);
-  //             IssueModel.find({
-  //               _id: { $in: unique_ids}
-  //             })
-  //             .then(docs=>{
-  //             console.log('zombie-records from web',docs);
-  //             assert.equal(docs[0].issue_title,'test1');
-  //             assert.equal(docs[1].issue_text,'test text1');
-  //             assert.equal(docs[0].open,true);
-  //             assert.equal(docs[1].created_by,'zombie')
-  //             })
-  //             .catch(err=>{
-  //             console.log(err)  
-  //             });
-              
-  //           });
-  //         });
-  //       done();
-  //     });
-  //   });
-  // });
+//       test("Submit the form and check for docs", function (done) {
+//         browser.assert.text("h1#projectTitle", "All issues for: foo");
+//         browser
+//           .fill("issue_title", "test1")
+//           .then(() => {
+//             browser.fill("issue_text", "test text1");
+//           })
+//           .then(() => {
+//             browser.fill("created_by", "zombie");
+//           })
+//           .then(() => {
+//             browser.pressButton("", () => {
+//               browser.assert.success();
+//               let ids = browser.html(".id").match(/[a-f\d]{24}/g);
+//               let unique_ids = [...new Set(ids)];
+//               console.log(unique_ids);
+//               IssueModel.find({
+//                 _id: { $in: unique_ids },
+//               })
+//                 .then((docs) => {
+//                   console.log("zombie-records from web", docs);
+//                   assert.equal(docs[0].issue_title, "test1");
+//                   assert.equal(docs[1].issue_text, "test text1");
+//                   assert.equal(docs[0].open, true);
+//                   assert.equal(docs[1].created_by, "zombie");
+//                   done();
+//                 })
+//                 .catch((err) => {
+//                   console.log(err);
+//                   done();
+//                 });
+//             });
+//           });
+//       });
+//     });
+//   });
 });
-
-
