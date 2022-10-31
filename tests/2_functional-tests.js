@@ -9,8 +9,8 @@ require("dotenv").config;
 const Browser = require("zombie/lib");
 // Browser.localAddress = "0.0.0.0:8080"
 Browser.localhost(
-//  "Issue-Tracker-Project.sathishkannan16.repl.co",
-  "example.com",
+   "Issue-Tracker-Project.sathishkannan16.repl.co",
+  // "example.com",
   process.env.PORT
 );
 // Browser.site ='0.0.0.0:8080';
@@ -112,7 +112,7 @@ suite("Functional Tests", function () {
         .send(message)
         .end(function (err, res) {
           assert.equal(res.status, 200);
-          assert.equal(res.body.name, "ValidationError");
+          assert.equal(res.body.error, "required field(s) missing");
           done();
         });
     });
@@ -205,10 +205,8 @@ suite("Functional Tests", function () {
           console.log(res.body, "from first put request");
           assert.equal(res.status, 200);
           assert.equal(res.type, "application/json");
-          assert.equal(res.body.open, false);
+          assert.equal(res.body.result, "successfully updated");
           assert.equal(res.body._id, testDoc._id);
-          assert.equal(res.body.issue_title, "Database connection error");
-          assert.equal(res.body.project, "soji");
           done();
         });
     });
@@ -229,10 +227,7 @@ suite("Functional Tests", function () {
           assert.equal(res.status, 200);
           assert.equal(res.type, "application/json");
           assert.equal(res.body._id, testDoc._id);
-          assert.equal(res.body.issue_title, "Database connection error");
-          assert.equal(res.body.project, "soji");
-          assert.equal(res.body.assigned_to, "Eli");
-          assert.equal(res.body.created_by, "Kan");
+          assert.equal(res.body.result, "successfully updated");
           done();
         });
     });
@@ -249,7 +244,7 @@ suite("Functional Tests", function () {
         .end(function (err, res) {
           console.log(res.text, "from third put request");
           assert.equal(res.status, 200);
-          assert.equal(res.text, "_id required");
+          assert.equal(res.body.error, "missing_id");
           done();
         });
     });
@@ -259,11 +254,14 @@ suite("Functional Tests", function () {
       chai
         .request(server)
         .put("/api/issues/soji")
-        .send({})
+        .send({
+          _id: testDoc._id,
+        })
         .end(function (err, res) {
           console.log(res.text, "from third put request");
           assert.equal(res.status, 200);
-          assert.equal(res.text, "_id required");
+          assert.equal(res.body.error, "no update field(s) sent");
+          assert.equal(res.body._id, testDoc._id);
           done();
         });
     });
@@ -276,11 +274,13 @@ suite("Functional Tests", function () {
         .put("/api/issues/soji")
         .send({
           _id: "635f79937f8ac56ec2e1eee7",
+          assigned_to: "Jess",
         })
         .end(function (err, res) {
           console.log(res.body, "from fourth put request");
           assert.equal(res.status, 200);
-          assert.equal(res.body, null);
+          assert.equal(res.body.error, "could not update");
+          assert.equal(res.body._id, "635f79937f8ac56ec2e1eee7");
           done();
         });
     });
@@ -299,10 +299,8 @@ suite("Functional Tests", function () {
           console.log(res.body, "from first delete request");
           assert.equal(res.status, 200);
           assert.equal(res.type, "application/json");
-          assert.equal(res.body.open, false);
           assert.equal(res.body._id, testDoc._id);
-          assert.equal(res.body.issue_title, "Database connection error");
-          assert.equal(res.body.project, "soji");
+          assert.equal(res.body.result, "successfully deleted");
           done();
         });
     });
@@ -319,7 +317,8 @@ suite("Functional Tests", function () {
         .end(function (err, res) {
           console.log(res.body, "from second delete request");
           assert.equal(res.status, 200);
-          assert.equal(res.body, null);
+          assert.equal(res.body.error,'could not delete');
+          assert.equal(res.body._id,'635f84869ede51b19d8ee614')
           done();
         });
     });
@@ -334,7 +333,7 @@ suite("Functional Tests", function () {
         .end(function (err, res) {
           console.log(res.body, "from third delete request");
           assert.equal(res.status, 200);
-          assert.equal(res.body, null);
+          assert.equal(res.body.error, 'missing _id');
           done();
         });
     });
@@ -361,60 +360,60 @@ suite("Functional Tests", function () {
     done();
   });
 
-//   suite("Functional tests with zombie", function () {
-//     const browser = new Browser();
-// //    browser.site = "https://Issue-Tracker-Project.sathishkannan16.repl.co"
+  //   suite("Functional tests with zombie", function () {
+  //     const browser = new Browser();
+  // //    browser.site = "https://Issue-Tracker-Project.sathishkannan16.repl.co"
 
-//     suiteSetup(function (done) {
-//       return browser.visit("/", done);
-//     });
+  //     suiteSetup(function (done) {
+  //       return browser.visit("/", done);
+  //     });
 
-//     suite("Headless browser", function () {
-//       this.timeout(5000);
-//       test('should have a working "site" property', function () {
-//         assert.isNotNull(browser.site);
-//       });
-//     });
+  //     suite("Headless browser", function () {
+  //       this.timeout(5000);
+  //       test('should have a working "site" property', function () {
+  //         assert.isNotNull(browser.site);
+  //       });
+  //     });
 
-//     suite("Issue form at /foo", function (done) {
-//       suiteSetup(function (done) {
-//         return browser.visit("/foo", done);
-//       });
+  //     suite("Issue form at /foo", function (done) {
+  //       suiteSetup(function (done) {
+  //         return browser.visit("/foo", done);
+  //       });
 
-//       test("Submit the form and check for docs", function (done) {
-//         browser.assert.text("h1#projectTitle", "All issues for: foo");
-//         browser
-//           .fill("issue_title", "test1")
-//           .then(() => {
-//             browser.fill("issue_text", "test text1");
-//           })
-//           .then(() => {
-//             browser.fill("created_by", "zombie");
-//           })
-//           .then(() => {
-//             browser.pressButton("", () => {
-//               browser.assert.success();
-//               let ids = browser.html(".id").match(/[a-f\d]{24}/g);
-//               let unique_ids = [...new Set(ids)];
-//               console.log(unique_ids);
-//               IssueModel.find({
-//                 _id: { $in: unique_ids },
-//               })
-//                 .then((docs) => {
-//                   console.log("zombie-records from web", docs);
-//                   assert.equal(docs[0].issue_title, "test1");
-//                   assert.equal(docs[1].issue_text, "test text1");
-//                   assert.equal(docs[0].open, true);
-//                   assert.equal(docs[1].created_by, "zombie");
-//                   done();
-//                 })
-//                 .catch((err) => {
-//                   console.log(err);
-//                   done();
-//                 });
-//             });
-//           });
-//       });
-//     });
-//   });
+  //       test("Submit the form and check for docs", function (done) {
+  //         browser.assert.text("h1#projectTitle", "All issues for: foo");
+  //         browser
+  //           .fill("issue_title", "test1")
+  //           .then(() => {
+  //             browser.fill("issue_text", "test text1");
+  //           })
+  //           .then(() => {
+  //             browser.fill("created_by", "zombie");
+  //           })
+  //           .then(() => {
+  //             browser.pressButton("", () => {
+  //               browser.assert.success();
+  //               let ids = browser.html(".id").match(/[a-f\d]{24}/g);
+  //               let unique_ids = [...new Set(ids)];
+  //               console.log(unique_ids);
+  //               IssueModel.find({
+  //                 _id: { $in: unique_ids },
+  //               })
+  //                 .then((docs) => {
+  //                   console.log("zombie-records from web", docs);
+  //                   assert.equal(docs[0].issue_title, "test1");
+  //                   assert.equal(docs[1].issue_text, "test text1");
+  //                   assert.equal(docs[0].open, true);
+  //                   assert.equal(docs[1].created_by, "zombie");
+  //                   done();
+  //                 })
+  //                 .catch((err) => {
+  //                   console.log(err);
+  //                   done();
+  //                 });
+  //             });
+  //           });
+  //       });
+  //     });
+  //   });
 });
