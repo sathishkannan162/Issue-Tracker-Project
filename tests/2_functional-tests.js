@@ -270,6 +270,63 @@ suite("Functional Tests", function () {
     });
   });
 
+  // Delete requests
+  suite("Test Delete requests with valid _id", function () {
+    test("Delete issue with valid _id", function (done) {
+      chai
+        .request(server)
+        .delete("/api/issues/soji")
+        .send({
+          _id: testDoc._id,
+        })
+        .end(function (err, res) {
+          console.log(res.body,'from first delete request');
+          assert.equal(res.status, 200);
+          assert.equal(res.type, "application/json");
+          assert.equal(res.body.open, false);
+          assert.equal(res.body._id, testDoc._id);
+          assert.equal(res.body.issue_title, "Database connection error");
+          assert.equal(res.body.project, "soji");
+          done();
+        });
+    });
+  }); 
+
+  suite("Test Delete requests with invalid _id", function () {
+    test("Delete issue with invalid _id", function (done) {
+      chai
+        .request(server)
+        .delete("/api/issues/soji")
+        .send({
+          _id: "635f84869ede51b19d8ee614",
+        })
+        .end(function (err, res) {
+          console.log(res.body,'from second delete request');
+          assert.equal(res.status, 200);
+          assert.equal(res.body,null);
+          done();
+        });
+    });
+  });
+
+  suite("Test Delete requests with missing _id", function () {
+    test("Delete issue with missing _id", function (done) {
+      chai
+        .request(server)
+        .delete("/api/issues/soji")
+        .send({
+        })
+        .end(function (err, res) {
+          console.log(res.body,'from third delete request');
+          assert.equal(res.status, 200);
+          assert.equal(res.body,null);
+          done();
+        });
+    });
+  });
+
+  
+
   suite("Delete Sample records and test records", function () {
     test("delete test and sample records", function () {
       // delete sample data and test records
