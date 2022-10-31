@@ -244,7 +244,7 @@ suite("Functional Tests", function () {
         .end(function (err, res) {
           console.log(res.text, "from third put request");
           assert.equal(res.status, 200);
-          assert.equal(res.body.error, "missing_id");
+          assert.equal(res.body.error, "missing _id");
           done();
         });
     });
