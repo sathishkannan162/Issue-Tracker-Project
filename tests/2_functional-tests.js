@@ -13,7 +13,6 @@ Browser.localhost(
   // "example.com",
   process.env.PORT
 );
-// Browser.site ='0.0.0.0:8080';
 let IssueModel = require("../database/issue");
 
 suite("Functional Tests", function () {
@@ -317,8 +316,8 @@ suite("Functional Tests", function () {
         .end(function (err, res) {
           console.log(res.body, "from second delete request");
           assert.equal(res.status, 200);
-          assert.equal(res.body.error,'could not delete');
-          assert.equal(res.body._id,'635f84869ede51b19d8ee614')
+          assert.equal(res.body.error, "could not delete");
+          assert.equal(res.body._id, "635f84869ede51b19d8ee614");
           done();
         });
     });
@@ -333,7 +332,7 @@ suite("Functional Tests", function () {
         .end(function (err, res) {
           console.log(res.body, "from third delete request");
           assert.equal(res.status, 200);
-          assert.equal(res.body.error, 'missing _id');
+          assert.equal(res.body.error, "missing _id");
           done();
         });
     });
@@ -360,60 +359,105 @@ suite("Functional Tests", function () {
     done();
   });
 
-  //   suite("Functional tests with zombie", function () {
-  //     const browser = new Browser();
-  // //    browser.site = "https://Issue-Tracker-Project.sathishkannan16.repl.co"
+  suite("Functional tests with zombie", function () {
+    const browser = new Browser();
+    //    browser.site = "https://Issue-Tracker-Project.sathishkannan16.repl.co"
 
-  //     suiteSetup(function (done) {
-  //       return browser.visit("/", done);
-  //     });
+    suiteSetup(function (done) {
+      return browser.visit("/", done);
+    });
 
-  //     suite("Headless browser", function () {
-  //       this.timeout(5000);
-  //       test('should have a working "site" property', function () {
-  //         assert.isNotNull(browser.site);
-  //       });
-  //     });
+    suite("Headless browser", function () {
+      this.timeout(5000);
+      test('should have a working "site" property', function () {
+        assert.isNotNull(browser.site);
+      });
+    });
 
-  //     suite("Issue form at /foo", function (done) {
-  //       suiteSetup(function (done) {
-  //         return browser.visit("/foo", done);
-  //       });
+    suite("Issue form at /foo", function (done) {
+      let unique_ids;
+      let testDoc;
+      suiteSetup(function (done) {
+        return browser.visit("/foo", done);
+      });
 
-  //       test("Submit the form and check for docs", function (done) {
-  //         browser.assert.text("h1#projectTitle", "All issues for: foo");
-  //         browser
-  //           .fill("issue_title", "test1")
-  //           .then(() => {
-  //             browser.fill("issue_text", "test text1");
-  //           })
-  //           .then(() => {
-  //             browser.fill("created_by", "zombie");
-  //           })
-  //           .then(() => {
-  //             browser.pressButton("", () => {
-  //               browser.assert.success();
-  //               let ids = browser.html(".id").match(/[a-f\d]{24}/g);
-  //               let unique_ids = [...new Set(ids)];
-  //               console.log(unique_ids);
-  //               IssueModel.find({
-  //                 _id: { $in: unique_ids },
-  //               })
-  //                 .then((docs) => {
-  //                   console.log("zombie-records from web", docs);
-  //                   assert.equal(docs[0].issue_title, "test1");
-  //                   assert.equal(docs[1].issue_text, "test text1");
-  //                   assert.equal(docs[0].open, true);
-  //                   assert.equal(docs[1].created_by, "zombie");
-  //                   done();
-  //                 })
-  //                 .catch((err) => {
-  //                   console.log(err);
-  //                   done();
-  //                 });
-  //             });
-  //           });
-  //       });
-  //     });
-  //   });
+      test("Submit the form and check for docs", function (done) {
+        browser.assert.text("h1#projectTitle", "All issues for: foo");
+        browser
+          .fill("issue_title", "test1")
+          .then(() => {
+            browser.fill("issue_text", "test text1");
+          })
+          .then(() => {
+            browser.fill("created_by", "zombie");
+          })
+          .then(() => {
+            browser.pressButton("", () => {
+              browser.assert.success();
+              let ids = browser.html(".id").match(/[a-f\d]{24}/g);
+              unique_ids = [...new Set(ids)];
+              console.log(unique_ids);
+              IssueModel.find({
+                _id: { $in: unique_ids },
+              })
+                .then((docs) => {
+                  testDoc = docs[0];
+                  console.log("zombie-records from web", docs);
+                  assert.equal(docs[0].issue_title, "test1");
+                  assert.equal(docs[1].issue_text, "test text1");
+                  assert.equal(docs[0].open, true);
+                  assert.equal(docs[1].created_by, "zombie");
+                  done();
+                })
+                .catch((err) => {
+                  console.log(err);
+                  done();
+                });
+            });
+          });
+      });
+      test("check close links", function (done) {
+        // browser.visit('/foo');
+        browser.clickLink("a.closeIssue").then(() => {
+          IssueModel.findOne({ _id: testDoc._id })
+            .then((docs) => {
+              console.log(docs);
+              assert.isFalse(docs.open);
+              done();
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+
+        });
+      });
+
+      /* clicking on delete link is not working. I tried creating a new browser
+       still it is not working. spent 1 hour */
+      // test("check delete links", function (done) {
+      //   browser.clickLink(".deleteIssue").then(() => {
+      //     IssueModel.find({ created_by: 'zombie' })
+      //       .then((docs) => {
+      //         console.log(docs);
+      //         assert.equal(docs.length,1);
+      //     done();
+      //       })
+      //       .catch((err) => {
+      //         console.log(err);
+      //       });
+
+      //   });
+      // });
+    });
+
+    suiteTeardown(function () {
+      IssueModel.deleteMany({ created_by: "zombie" })
+        .then((docs) => {
+          console.log("deleted zombie test data", docs);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    });
+  });
 });
