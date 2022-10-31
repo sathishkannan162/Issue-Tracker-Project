@@ -1,14 +1,15 @@
 const chaiHttp = require("chai-http");
 const chai = require("chai");
 const assert = chai.assert;
-const server = require("../server");
-const myDB = require("../database/connection");
-const sampleData = require("../database/sampleIssues");
-
+const server = require('../server');
+const myDB = require('../database/connection');
+const sampleData = require('../database/sampleIssues');
 chai.use(chaiHttp);
+
 
 suite("Functional Tests", function () {
   this.timeout(5000);
+  let testDoc;
   // insert sample data for get query tests
   myDB(async (IssueModel) => {
     await IssueModel.insertMany(sampleData)
@@ -18,8 +19,20 @@ suite("Functional Tests", function () {
       .catch((err) => {
         console.log(err);
       });
+
+      IssueModel.findOne({
+        issue_title: "Database connection error"
+      })
+      .then(docs=>{
+      testDoc = docs;
+        
+      })
+      .catch(err=>{
+      console.log(err);
+      });
   });
 
+  // POST request
   suite("Test all fields POST api/project/chaiTests", function () {
     test("fill all fields in FORM 1", function (done) {
       const message = {
@@ -93,6 +106,9 @@ suite("Functional Tests", function () {
         });
     });
   });
+
+
+  // GET requests
   suite("TeSt GET request to /api/issues/{project} with no filter", function () {
     test("TeSt GET request to /api/issues/{project}", function (done) {
       chai
@@ -125,7 +141,7 @@ suite("Functional Tests", function () {
     });
   });
   suite("TeSt GET request to /api/issues/{project} with multiple filters", function () {
-    test("TeSt GET request to /api/issues/{project}", function (done) {
+    test("TeSt GET request with two queries", function (done) {
       chai
         .request(server)
         .get("/api/issues/checko?assigned_to=Joe&open=true")
@@ -141,7 +157,7 @@ suite("Functional Tests", function () {
         });
     });
 
-    test("TeSt GET request to /api/issues/{project}", function (done) {
+    test("TeSt GET request with three queries", function (done) {
       chai
         .request(server)
         .get("/api/issues/daph?assigned_to=Bale&open=false&created_by=Bale")
@@ -155,11 +171,90 @@ suite("Functional Tests", function () {
         });
     });
   });
+
+  // PUT requests
+  suite("Test PUT - Update one filed", function () {
+    test("Update open to false in a given doc in project soji", function (done) {
+      chai
+        .request(server)
+        .put("/api/issues/soji")
+        .send({
+          _id: testDoc._id,
+          open: false
+        })
+        .end(function (err, res) {
+          console.log(res.body,'from first put request');
+          assert.equal(res.status, 200);
+          assert.equal(res.type, "application/json");
+          assert.equal(res.body.open, false);
+          assert.equal(res.body._id, testDoc._id);
+          assert.equal(res.body.issue_title, "Database connection error");
+          assert.equal(res.body.project, "soji");
+          done();
+        });
+    });
+  }); 
   
+  suite("Test PUT - Update multiple field field filed", function () {
+    test("Update assigned to and created by in a given doc in project soji", function (done) {
+      chai
+        .request(server)
+        .put("/api/issues/soji")
+        .send({
+          _id: testDoc._id,
+          assigned_to: "Eli",
+          created_by: "Kan"
+        })
+        .end(function (err, res) {
+          console.log(res.body,'from second put request');
+          assert.equal(res.status, 200);
+          assert.equal(res.type, "application/json");
+          assert.equal(res.body._id, testDoc._id);
+          assert.equal(res.body.issue_title, "Database connection error");
+          assert.equal(res.body.project, "soji");
+          assert.equal(res.body.assigned_to, "Eli");
+          assert.equal(res.body.created_by, "Kan");
+          done();
+        });
+    });
+  }); 
+
+  suite("Test PUT - Update an Issue with missign _id field", function () {
+    test("Update assigned to and created by in a given doc in project soji", function (done) {
+      chai
+        .request(server)
+        .put("/api/issues/soji")
+        .send({
+          assigned_to: "Kan"
+        })
+        .end(function (err, res) {
+          console.log(res.text,'from third put request');
+          assert.equal(res.status, 200);
+          assert.equal(res.text,'_id required');
+          done();
+        });
+    });
+  });
+  
+  suite("Test PUT - Update an Issue with no field", function () {
+    test("Update assigned to and created by in a given doc in project soji", function (done) {
+      chai
+        .request(server)
+        .put("/api/issues/soji")
+        .send({
+        })
+        .end(function (err, res) {
+          console.log(res.text,'from third put request');
+          assert.equal(res.status, 200);
+          assert.equal(res.text,'_id required');
+          done();
+        });
+    });
+  });
 
   suite("Delete Sample records and test records", function () {
-    test("delete test and sample records", async function () {
-      // delete test records
+    test("delete test and sample records", function () {
+      // delete sample data and test records
       myDB(async (IssueModel) => {
         IssueModel.deleteMany({ project: "chaiTests" })
           .then((docs) => {
@@ -168,10 +263,7 @@ suite("Functional Tests", function () {
           .catch((err) => {
             console.log(err);
           });
-      });
-      // delete sample data
-      myDB(async (IssueModel) => {
-        await IssueModel.deleteMany({project: {$in: ["checko","soji","daph"] }})
+          IssueModel.deleteMany({project: {$in: ["checko","soji","daph"] }})
           .then((docs) => {
             console.log("sample data deleted:", docs);
           })
