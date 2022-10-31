@@ -220,7 +220,7 @@ suite("Functional Tests", function () {
   }); 
 
   suite("Test PUT - Update an Issue with missign _id field", function () {
-    test("Update assigned to and created by in a given doc in project soji", function (done) {
+    test("Update with missing id in project soji", function (done) {
       chai
         .request(server)
         .put("/api/issues/soji")
@@ -237,7 +237,7 @@ suite("Functional Tests", function () {
   });
   
   suite("Test PUT - Update an Issue with no field", function () {
-    test("Update assigned to and created by in a given doc in project soji", function (done) {
+    test("Update with no field in project soji", function (done) {
       chai
         .request(server)
         .put("/api/issues/soji")
@@ -247,6 +247,24 @@ suite("Functional Tests", function () {
           console.log(res.text,'from third put request');
           assert.equal(res.status, 200);
           assert.equal(res.text,'_id required');
+          done();
+        });
+    });
+  });
+
+  suite("Test PUT - Update an doc with invalid _id", function () {
+    test("Update with invalid _id field", function (done) {
+      chai
+        .request(server)
+        .put("/api/issues/soji")
+        .send({
+          _id: '635f79937f8ac56ec2e1eee7'
+        })
+        .end(function (err, res) {
+          console.log(res.body,'from fourth put request');
+          assert.equal(res.status, 200);
+          assert.equal(res.body,null);
+          // assert.equal(res.text,'_id required');
           done();
         });
     });
