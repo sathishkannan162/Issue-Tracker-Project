@@ -277,7 +277,6 @@ suite("Functional Tests", function () {
           console.log(res.body, "from fourth put request");
           assert.equal(res.status, 200);
           assert.equal(res.body, null);
-          assert.equal(res.text,'_id required');
           done();
         });
     });
