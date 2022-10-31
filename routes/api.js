@@ -40,10 +40,11 @@ module.exports = function (app,IssueModel) {
     .put(function (req, res){
       let project = req.params.project;
       if (req.body._id) {
-      console.log(req.body);
+      console.log(req.body._id,'from api put');
       req.body.updated_on = new Date();
       IssueModel.findOneAndUpdate({
         _id: req.body._id,
+        project: project
       },{
         $set:req.body,
       },{new: true})
@@ -53,6 +54,7 @@ module.exports = function (app,IssueModel) {
       })
       .catch(err=>{
       console.log(err);
+      res.send(err);
       });
     }
     else {
