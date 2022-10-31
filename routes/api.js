@@ -77,7 +77,7 @@ module.exports = function (app, IssueModel) {
             res.json({ error: "could not update", _id: req.body._id });
           });
       } else {
-        res.json({ error: "missing_id" });
+        res.json({ error: "missing _id" });
       }
     })
 
