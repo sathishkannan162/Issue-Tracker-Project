@@ -5,32 +5,37 @@ const server = require('../server');
 const myDB = require('../database/connection');
 const sampleData = require('../database/sampleIssues');
 chai.use(chaiHttp);
+require('dotenv').config;
 
 
 suite("Functional Tests", function () {
   this.timeout(5000);
   let testDoc;
-  // insert sample data for get query tests
-  myDB(async (IssueModel) => {
-    await IssueModel.insertMany(sampleData)
-      .then((docs) => {
-        console.log("sample data inserted:", docs);
-      })
-      .catch((err) => {
+  suiteSetup(function(done){
+    // insert sample data for get query tests
+    myDB(async (IssueModel) => {
+      await IssueModel.insertMany(sampleData)
+        .then((docs) => {
+          console.log("sample data inserted:", docs);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+  
+        IssueModel.findOne({
+          issue_title: "Database connection error"
+        })
+        .then(docs=>{
+        testDoc = docs;
+        done();
+          
+        })
+        .catch(err=>{
         console.log(err);
-      });
-
-      IssueModel.findOne({
-        issue_title: "Database connection error"
-      })
-      .then(docs=>{
-      testDoc = docs;
-        
-      })
-      .catch(err=>{
-      console.log(err);
-      });
-  });
+        });
+    });
+  })
+ 
 
   // POST request
   suite("Test all fields POST api/project/chaiTests", function () {
@@ -326,28 +331,27 @@ suite("Functional Tests", function () {
   });
 
   
-
-  suite("Delete Sample records and test records", function () {
-    test("delete test and sample records", function () {
-      // delete sample data and test records
-      myDB(async (IssueModel) => {
-        IssueModel.deleteMany({ project: "chaiTests" })
-          .then((docs) => {
-            console.log("test data deleted:", docs);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-          IssueModel.deleteMany({project: {$in: ["checko","soji","daph"] }})
-          .then((docs) => {
-            console.log("sample data deleted:", docs);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+  suiteTeardown(function(done){
+  // delete sample data and test records
+  myDB(async (IssueModel) => {
+    IssueModel.deleteMany({ project: "chaiTests" })
+      .then((docs) => {
+        console.log("test data deleted:", docs);
+      })
+      .catch((err) => {
+        console.log(err);
       });
-    });
+      IssueModel.deleteMany({project: {$in: ["checko","soji","daph"] }})
+      .then((docs) => {
+        console.log("sample data deleted:", docs);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   });
+  done();
+  })
+
 });
 
 
