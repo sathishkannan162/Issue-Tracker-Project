@@ -19,8 +19,7 @@ suite("Functional Tests", function () {
   this.timeout(5000);
   let testDoc;
   suiteSetup(function (done) {
-    // insert sample data for get query tests
-    myDB(async (IssueModel) => {
+    let insertData = async () => {
       await IssueModel.insertMany(sampleData)
         .then((docs) => {
           console.log("sample data inserted:", docs.length);
@@ -39,7 +38,9 @@ suite("Functional Tests", function () {
         .catch((err) => {
           console.log(err);
         });
-    });
+    };
+
+    insertData();
   });
 
   // POST request
@@ -332,22 +333,25 @@ suite("Functional Tests", function () {
 
   suiteTeardown(function (done) {
     // delete sample data and test records
-    myDB(async (IssueModel) => {
-      IssueModel.deleteMany({ project: "chaiTests" })
+    let deleteData = async function () {
+      await IssueModel.deleteMany({ project: "chaiTests" })
         .then((docs) => {
           console.log("test data deleted:", docs);
         })
         .catch((err) => {
           console.log(err);
         });
-      IssueModel.deleteMany({ project: { $in: ["checko", "soji", "daph"] } })
+      await IssueModel.deleteMany({
+        project: { $in: ["checko", "soji", "daph"] },
+      })
         .then((docs) => {
           console.log("sample data deleted:", docs);
         })
         .catch((err) => {
           console.log(err);
         });
-    });
+    };
+    deleteData();
     done();
   });
 
@@ -417,7 +421,6 @@ suite("Functional Tests", function () {
             .catch((err) => {
               console.log(err);
             });
-
         });
       });
 
