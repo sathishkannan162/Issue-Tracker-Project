@@ -412,7 +412,7 @@ suite("Functional Tests", function () {
       });
       test("check close links", function (done) {
         // browser.visit('/foo');
-        browser.clickLink("a.closeIssue").then(() => {
+        browser.clickLink(".closeIssue").then(() => {
           IssueModel.findOne({ _id: testDoc._id })
             .then((docs) => {
               assert.isFalse(docs.open);
