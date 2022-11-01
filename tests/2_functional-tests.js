@@ -201,7 +201,6 @@ suite("Functional Tests", function () {
           open: false,
         })
         .end(function (err, res) {
-          console.log(res.body, "from first put request");
           assert.equal(res.status, 200);
           assert.equal(res.type, "application/json");
           assert.equal(res.body.result, "successfully updated");
@@ -222,7 +221,6 @@ suite("Functional Tests", function () {
           created_by: "Kan",
         })
         .end(function (err, res) {
-          console.log(res.body, "from second put request");
           assert.equal(res.status, 200);
           assert.equal(res.type, "application/json");
           assert.equal(res.body._id, testDoc._id);
@@ -241,7 +239,6 @@ suite("Functional Tests", function () {
           assigned_to: "Kan",
         })
         .end(function (err, res) {
-          console.log(res.text, "from third put request");
           assert.equal(res.status, 200);
           assert.equal(res.body.error, "missing _id");
           done();
@@ -257,7 +254,6 @@ suite("Functional Tests", function () {
           _id: testDoc._id,
         })
         .end(function (err, res) {
-          console.log(res.text, "from third put request");
           assert.equal(res.status, 200);
           assert.equal(res.body.error, "no update field(s) sent");
           assert.equal(res.body._id, testDoc._id);
@@ -276,7 +272,6 @@ suite("Functional Tests", function () {
           assigned_to: "Jess",
         })
         .end(function (err, res) {
-          console.log(res.body, "from fourth put request");
           assert.equal(res.status, 200);
           assert.equal(res.body.error, "could not update");
           assert.equal(res.body._id, "635f79937f8ac56ec2e1eee7");
@@ -295,7 +290,6 @@ suite("Functional Tests", function () {
           _id: testDoc._id,
         })
         .end(function (err, res) {
-          console.log(res.body, "from first delete request");
           assert.equal(res.status, 200);
           assert.equal(res.type, "application/json");
           assert.equal(res.body._id, testDoc._id);
@@ -314,7 +308,6 @@ suite("Functional Tests", function () {
           _id: "635f84869ede51b19d8ee614",
         })
         .end(function (err, res) {
-          console.log(res.body, "from second delete request");
           assert.equal(res.status, 200);
           assert.equal(res.body.error, "could not delete");
           assert.equal(res.body._id, "635f84869ede51b19d8ee614");
@@ -330,7 +323,6 @@ suite("Functional Tests", function () {
         .delete("/api/issues/soji")
         .send({})
         .end(function (err, res) {
-          console.log(res.body, "from third delete request");
           assert.equal(res.status, 200);
           assert.equal(res.body.error, "missing _id");
           done();
@@ -396,13 +388,11 @@ suite("Functional Tests", function () {
               browser.assert.success();
               let ids = browser.html(".id").match(/[a-f\d]{24}/g);
               unique_ids = [...new Set(ids)];
-              console.log(unique_ids);
               IssueModel.find({
                 _id: { $in: unique_ids },
               })
                 .then((docs) => {
                   testDoc = docs[0];
-                  console.log("zombie-records from web", docs);
                   assert.equal(docs[0].issue_title, "test1");
                   assert.equal(docs[1].issue_text, "test text1");
                   assert.equal(docs[0].open, true);
