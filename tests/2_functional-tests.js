@@ -23,7 +23,7 @@ suite("Functional Tests", function () {
     myDB(async (IssueModel) => {
       await IssueModel.insertMany(sampleData)
         .then((docs) => {
-          console.log("sample data inserted:", docs);
+          console.log("sample data inserted:", docs.length);
         })
         .catch((err) => {
           console.log(err);
@@ -411,7 +411,6 @@ suite("Functional Tests", function () {
         browser.clickLink("a.closeIssue").then(() => {
           IssueModel.findOne({ _id: testDoc._id })
             .then((docs) => {
-              console.log(docs);
               assert.isFalse(docs.open);
               done();
             })

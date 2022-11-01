@@ -26,7 +26,7 @@ module.exports = function (app, IssueModel) {
       query.project = project;
       IssueModel.find(query, { project: 0, __v: 0 })
         .then((docs) => {
-          console.log(`sent project: ${project} issues to api`);
+          console.log(`sent all ${project} project issues`);
           res.json(docs);
         })
         .catch((err) => {
@@ -39,7 +39,7 @@ module.exports = function (app, IssueModel) {
       req.body.project = project;
       IssueModel.create(req.body)
         .then((docs) => {
-          console.log("inserted", docs);
+          console.log("inserted one record with id:", docs._id);
           res.send(docs);
         })
         .catch((err) => {
@@ -49,7 +49,6 @@ module.exports = function (app, IssueModel) {
 
     .put(function (req, res) {
       let project = req.params.project;
-      console.log(req.body, "from api put");
       if (req.body.hasOwnProperty("_id") && Object.keys(req.body).length == 1) {
         res.json({ error: "no update field(s) sent", _id: req.body._id });
       } else if (req.body.hasOwnProperty("_id")) {
@@ -68,9 +67,9 @@ module.exports = function (app, IssueModel) {
             if (docs == null) {
               res.json({ error: "could not update", _id: req.body._id });
             } else {
+              console.log("updated one doc with id:", docs._id);
               res.json({ result: "successfully updated", _id: docs._id });
             }
-            console.log("updated", docs);
           })
           .catch((err) => {
             console.log(err);
@@ -92,10 +91,10 @@ module.exports = function (app, IssueModel) {
         project: project,
       })
         .then((docs) => {
-          console.log("deleted", docs);
           if (docs == null) {
             res.json({ error: "could not delete", _id: req.body._id });
           } else {
+            console.log("deleted one doc with id:", docs._id);
             res.json({ result: "successfully deleted", _id: req.body._id });
           }
         })
